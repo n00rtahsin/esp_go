@@ -8,9 +8,6 @@
 ![Control](https://img.shields.io/badge/Control-Wi--Fi%20Browser-blueviolet?style=for-the-badge)
 
 **A fully self-leveling micro quadcopter controlled via a browser-based dual-joystick interface over Wi-Fi, powered by an ESP32 microcontroller, MPU6050 IMU, and four 8520 coreless brushed motors.**
-</div>
-
-![Uploading image.png…]()
 
 </div>
 ---
