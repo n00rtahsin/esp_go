@@ -3,7 +3,6 @@
 <div align="center">
 
 ![ESP32](https://img.shields.io/badge/MCU-ESP32-blue?style=for-the-badge&logo=espressif)
-![Platform](https://img.shields.io/badge/Platform-Arduino%20%2F%20ESP-IDF-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Build%20Ready-brightgreen?style=for-the-badge)
 ![Control](https://img.shields.io/badge/Control-Wi--Fi%20Browser-blueviolet?style=for-the-badge)
