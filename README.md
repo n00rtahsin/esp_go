@@ -10,7 +10,8 @@
 **A fully self-leveling micro quadcopter controlled via a browser-based dual-joystick interface over Wi-Fi, powered by an ESP32 microcontroller, MPU6050 IMU, and four 8520 coreless brushed motors.**
 </div>
 
-![ESP_GO Mini Drone](image.png)
+![Uploading image.png…]()
+
 </div>
 ---
 
