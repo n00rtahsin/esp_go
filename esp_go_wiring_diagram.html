@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP_GO — Wiring & Connection Diagram</title>
+<style>
+  :root{
+    --bg: #0b0f0d;
+    --bg-panel: #111713;
+    --grid-line: #1c2520;
+    --copper: #ff8a3d;
+    --copper-dim: #7a4a26;
+    --signal: #4ee2b8;
+    --signal-dim: #245a4a;
+    --power: #ff5d5d;
+    --power-dim: #5a2424;
+    --ground: #9aa6a0;
+    --ground-dim: #3a423e;
+    --text-main: #eef2ef;
+    --text-dim: #8a958f;
+    --text-faint: #586059;
+    --silk: #d8dfda;
+    --accent-fl: #ff8a3d;
+    --accent-fr: #4ee2b8;
+    --accent-bl: #c98bff;
+    --accent-br: #ffd84a;
+    --mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+    --display: 'Space Grotesk', sans-serif;
+  }
+
+  @font-face{
+    font-family:'IBM Plex Mono';
+    src: local('IBM Plex Mono');
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--text-main);
+    font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-attachment:fixed;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:48px 24px 100px;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────── */
+  header{
+    border-bottom:1px solid var(--grid-line);
+    padding-bottom:28px;
+    margin-bottom:36px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+
+  .title-block h1{
+    font-family:var(--display);
+    font-size:clamp(2.2rem, 5vw, 3.4rem);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin:0 0 6px;
+    color:var(--text-main);
+  }
+
+  .title-block h1 span{
+    color:var(--copper);
+  }
+
+  .title-block .sub{
+    color:var(--text-dim);
+    font-size:0.85rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+
+  .doc-meta{
+    text-align:right;
+    font-size:0.72rem;
+    color:var(--text-faint);
+    line-height:1.6;
+    letter-spacing:0.03em;
+  }
+  .doc-meta b{ color:var(--signal); font-weight:600; }
+
+  /* ── LEGEND ─────────────────────────────────────────── */
+  .legend{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-bottom:40px;
+    padding:14px 18px;
+    background:var(--bg-panel);
+    border:1px solid var(--grid-line);
+    border-radius:6px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:0.72rem;
+    color:var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .legend-swatch{
+    width:22px;
+    height:3px;
+    border-radius:2px;
+    flex-shrink:0;
+  }
+  .legend-swatch.power{ background:var(--power); box-shadow:0 0 6px var(--power); }
+  .legend-swatch.ground{ background:var(--ground); }
+  .legend-swatch.signal{ background:var(--signal); box-shadow:0 0 6px var(--signal); }
+  .legend-swatch.i2c{ background:var(--accent-bl); box-shadow:0 0 6px var(--accent-bl); }
+  .legend-swatch.pwm{ background:var(--accent-br); box-shadow:0 0 6px var(--accent-br); }
+
+  /* ── SECTION HEADERS ────────────────────────────────── */
+  .sec-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin:64px 0 22px;
+  }
+  .sec-num{
+    font-family:var(--display);
+    font-size:0.8rem;
+    color:var(--bg);
+    background:var(--copper);
+    padding:3px 9px;
+    border-radius:3px;
+    font-weight:700;
+    letter-spacing:0.02em;
+  }
+  .sec-head h2{
+    font-family:var(--display);
+    font-size:1.5rem;
+    margin:0;
+    color:var(--text-main);
+    letter-spacing:-0.01em;
+  }
+  .sec-head .sec-line{
+    flex:1;
+    height:1px;
+    background:var(--grid-line);
+  }
+  .sec-desc{
+    color:var(--text-dim);
+    font-size:0.86rem;
+    max-width:760px;
+    line-height:1.65;
+    margin:-8px 0 28px;
+  }
+
+  /* ── DIAGRAM STAGE ──────────────────────────────────── */
+  .stage{
+    background:var(--bg-panel);
+    border:1px solid var(--grid-line);
+    border-radius:10px;
+    padding:6px;
+    margin-bottom:18px;
+    overflow:hidden;
+  }
+  .stage svg{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+
+  .stage-caption{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.68rem;
+    color:var(--text-faint);
+    padding:4px 10px 16px;
+    letter-spacing:0.03em;
+  }
+  .stage-caption .hint{ color:var(--signal-dim); }
+
+  /* Diagram element classes (used inside SVGs) */
+  .lbl{ font-family:var(--mono); fill:var(--text-main); font-size:12px; }
+  .lbl-dim{ font-family:var(--mono); fill:var(--text-dim); font-size:10px; }
+  .lbl-pin{ font-family:var(--mono); fill:var(--text-faint); font-size:9px; letter-spacing:0.02em; }
+  .node-box{ fill:var(--bg); stroke:var(--grid-line); stroke-width:1.4; }
+  .node-box.highlight{ stroke:var(--copper); }
+  .wire-power{ stroke:var(--power); stroke-width:2.2; fill:none; }
+  .wire-ground{ stroke:var(--ground); stroke-width:2.2; fill:none; }
+  .wire-signal{ stroke:var(--signal); stroke-width:2; fill:none; }
+  .wire-i2c{ stroke:var(--accent-bl); stroke-width:2; fill:none; }
+  .pad{ fill:var(--bg); stroke-width:1.4; }
+  .pad-power{ stroke:var(--power); }
+  .pad-ground{ stroke:var(--ground); }
+  .pad-signal{ stroke:var(--signal); }
+  .pad-i2c{ stroke:var(--accent-bl); }
+  .dot{ r:3; }
+
+  /* ── INTERACTIVE WIRING MAP ────────────────────────── */
+  .map-shell{
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    gap:18px;
+    background:var(--bg-panel);
+    border:1px solid var(--grid-line);
+    border-radius:10px;
+    padding:18px;
+  }
+  @media(max-width:880px){
+    .map-shell{ grid-template-columns:1fr; }
+  }
+
+  #wiringSvgHost{ width:100%; }
+  #wiringSvgHost svg{ width:100%; height:auto; display:block; }
+
+  .node{ cursor:pointer; transition:opacity .15s ease; }
+  .node:hover .node-box{ stroke-width:2.4; }
+  .node.dimmed{ opacity:0.22; }
+  .wire{ transition:opacity .15s ease, stroke-width .15s ease; cursor:pointer; }
+  .wire.dimmed{ opacity:0.08; }
+  .wire.active{ stroke-width:3.4; }
+
+  .inspector{
+    background:var(--bg);
+    border:1px solid var(--grid-line);
+    border-radius:8px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    min-height:340px;
+  }
+  .inspector .ins-empty{
+    color:var(--text-faint);
+    font-size:0.78rem;
+    margin:auto 0;
+    text-align:center;
+    line-height:1.7;
+  }
+  .ins-tag{
+    display:inline-block;
+    font-size:0.62rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:3px;
+    margin-bottom:10px;
+    width:fit-content;
+  }
+  .ins-tag.power{ background:var(--power-dim); color:var(--power); }
+  .ins-tag.ground{ background:var(--ground-dim); color:var(--ground); }
+  .ins-tag.actuator{ background:#3a2f12; color:var(--accent-br); }
+  .ins-tag.sensor{ background:#1f3a35; color:var(--signal); }
+  .ins-tag.mcu{ background:#2a1f3a; color:var(--accent-bl); }
+
+  .inspector h3{
+    font-family:var(--display);
+    font-size:1.15rem;
+    margin:0 0 4px;
+    color:var(--text-main);
+  }
+  .inspector .ins-sub{
+    font-size:0.72rem;
+    color:var(--text-dim);
+    margin-bottom:16px;
+    line-height:1.5;
+  }
+  .pin-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:7px 0;
+    border-bottom:1px solid var(--grid-line);
+    font-size:0.76rem;
+  }
+  .pin-row:last-child{ border-bottom:none; }
+  .pin-row .pin-name{ color:var(--text-main); font-weight:600; }
+  .pin-row .pin-target{ color:var(--text-dim); text-align:right; }
+  .pin-dot{
+    display:inline-block;
+    width:7px; height:7px;
+    border-radius:50%;
+    margin-right:7px;
+  }
+  .pin-dot.power{ background:var(--power); box-shadow:0 0 5px var(--power); }
+  .pin-dot.ground{ background:var(--ground); }
+  .pin-dot.signal{ background:var(--signal); box-shadow:0 0 5px var(--signal); }
+  .pin-dot.i2c{ background:var(--accent-bl); box-shadow:0 0 5px var(--accent-bl); }
+
+  /* ── PIN TABLES ─────────────────────────────────────── */
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--grid-line);
+    border-radius:8px;
+    margin-bottom:28px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.8rem;
+    background:var(--bg-panel);
+  }
+  thead th{
+    text-align:left;
+    font-size:0.66rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-faint);
+    padding:12px 16px;
+    border-bottom:1px solid var(--grid-line);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:11px 16px;
+    border-bottom:1px solid var(--grid-line);
+    color:var(--text-main);
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:rgba(255,255,255,0.02); }
+  .tag-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:0.66rem;
+    padding:3px 8px;
+    border-radius:20px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .tag-pill.power{ background:var(--power-dim); color:var(--power); }
+  .tag-pill.ground{ background:var(--ground-dim); color:var(--ground); }
+  .tag-pill.pwm{ background:#3a2f12; color:var(--accent-br); }
+  .tag-pill.i2c{ background:#2a1f3a; color:var(--accent-bl); }
+  .tag-pill.data{ background:#1f3a35; color:var(--signal); }
+  td.mono-faint{ color:var(--text-dim); font-size:0.74rem; }
+
+  /* ── MOTOR LAYOUT QUADRANT ─────────────────────────── */
+  .quad-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:14px;
+    margin-bottom:28px;
+  }
+  @media(max-width:640px){ .quad-grid{ grid-template-columns:1fr; } }
+  .quad-card{
+    background:var(--bg-panel);
+    border:1px solid var(--grid-line);
+    border-radius:8px;
+    padding:18px 20px;
+    border-left:3px solid var(--text-faint);
+  }
+  .quad-card.fl{ border-left-color:var(--accent-fl); }
+  .quad-card.fr{ border-left-color:var(--accent-fr); }
+  .quad-card.bl{ border-left-color:var(--accent-bl); }
+  .quad-card.br{ border-left-color:var(--accent-br); }
+  .quad-card .qhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .quad-card .qpos{
+    font-family:var(--display);
+    font-size:1rem;
+    font-weight:700;
+  }
+  .quad-card.fl .qpos{ color:var(--accent-fl); }
+  .quad-card.fr .qpos{ color:var(--accent-fr); }
+  .quad-card.bl .qpos{ color:var(--accent-bl); }
+  .quad-card.br .qpos{ color:var(--accent-br); }
+  .quad-card .qrot{
+    font-size:0.66rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-dim);
+    background:var(--bg);
+    padding:3px 8px;
+    border-radius:3px;
+  }
+  .quad-card .qrow{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.76rem;
+    padding:4px 0;
+    color:var(--text-dim);
+  }
+  .quad-card .qrow b{ color:var(--text-main); font-weight:600; }
+
+  /* ── FOOTNOTE / WARNING STRIP ───────────────────────── */
+  .warn-strip{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:#1a1310;
+    border:1px solid var(--power-dim);
+    border-radius:8px;
+    padding:14px 18px;
+    margin:18px 0 40px;
+    font-size:0.78rem;
+    color:#d9b8a8;
+    line-height:1.6;
+  }
+  .warn-strip .wmark{
+    color:var(--power);
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .note-strip{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:#0f1a17;
+    border:1px solid var(--signal-dim);
+    border-radius:8px;
+    padding:14px 18px;
+    margin:18px 0 40px;
+    font-size:0.78rem;
+    color:#a8d9cb;
+    line-height:1.6;
+  }
+  .note-strip .nmark{ color:var(--signal); font-weight:700; flex-shrink:0; }
+
+  footer{
+    border-top:1px solid var(--grid-line);
+    margin-top:60px;
+    padding-top:24px;
+    color:var(--text-faint);
+    font-size:0.7rem;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  @media print{
+    body{ background:#fff; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>ESP_<span>GO</span> — Wiring Diagram</h1>
+      <div class="sub">ESP32 Quadcopter · Full Connection Reference</div>
+    </div>
+    <div class="doc-meta">
+      REV <b>1.0</b> · LOGIC LEVEL <b>3.3V</b><br>
+      MCU <b>ESP32 DEVKIT</b> · CELLS <b>1S LIPO</b><br>
+      DRIVE <b>4× SI2302 N-MOSFET</b>
+    </div>
+  </header>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch power"></span> Power (LiPo +V / 3V3 / VIN)</div>
+    <div class="legend-item"><span class="legend-swatch ground"></span> Ground</div>
+    <div class="legend-item"><span class="legend-swatch pwm"></span> PWM (Gate Drive)</div>
+    <div class="legend-item"><span class="legend-swatch i2c"></span> I²C (SDA / SCL)</div>
+  </div>
+
+  <!-- ════════════════════ SECTION 1 — FULL SCHEMATIC ════════════════════ -->
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Full System Schematic</h2>
+    <span class="sec-line"></span>
+  </div>
+  <p class="sec-desc">
+    Every wire in the build, drawn as one signal path: power distribution from the LiPo cell, the four
+    independent MOSFET-switched motor channels, and the I²C link to the MPU6050 IMU. Trace any line by colour —
+    red is power, grey is ground, amber is PWM gate drive, purple is I²C.
+  </p>
+
+  <div class="stage">
+    <svg viewBox="0 0 1120 640" xmlns="http://www.w3.org/2000/svg">
+      <!-- LiPo -->
+      <g>
+        <rect x="20" y="280" width="120" height="80" rx="6" class="node-box"/>
+        <text x="80" y="312" text-anchor="middle" class="lbl">LiPo 3.7V</text>
+        <text x="80" y="328" text-anchor="middle" class="lbl-dim">1000mAh</text>
+        <circle cx="140" cy="300" r="3" class="dot" fill="var(--power)"/>
+        <text x="148" y="304" class="lbl-pin">+V</text>
+        <circle cx="140" cy="340" r="3" class="dot" fill="var(--ground)"/>
+        <text x="148" y="344" class="lbl-pin">GND</text>
+      </g>
+
+      <!-- Power bus -->
+      <path d="M140,300 H210" class="wire-power"/>
+      <path d="M140,340 H210" class="wire-ground"/>
+      <line x1="210" y1="120" x2="210" y2="520" stroke="var(--power)" stroke-width="2.2"/>
+      <line x1="218" y1="140" x2="218" y2="540" stroke="var(--ground)" stroke-width="2.2"/>
+      <text x="196" y="112" class="lbl-pin" text-anchor="end" fill="var(--power)">+V BUS</text>
+      <text x="230" y="548" class="lbl-pin" fill="var(--ground)">GND BUS</text>
+
+      <!-- ESP32 -->
+      <g>
+        <rect x="430" y="260" width="160" height="140" rx="6" class="node-box highlight"/>
+        <text x="510" y="300" text-anchor="middle" class="lbl">ESP32</text>
+        <text x="510" y="316" text-anchor="middle" class="lbl-dim">DevKit · AMS1117</text>
+        <!-- pins left -->
+        <circle cx="430" cy="280" r="3" fill="var(--power)"/>
+        <text x="422" y="284" class="lbl-pin" text-anchor="end">VIN</text>
+        <circle cx="430" cy="340" r="3" fill="var(--ground)"/>
+        <text x="422" y="344" class="lbl-pin" text-anchor="end">GND</text>
+        <circle cx="430" cy="380" r="3" fill="var(--power)"/>
+        <text x="422" y="384" class="lbl-pin" text-anchor="end">3V3</text>
+        <!-- pins right -->
+        <circle cx="590" cy="270" r="3" fill="var(--accent-br)"/>
+        <text x="598" y="274" class="lbl-pin">GPIO13</text>
+        <circle cx="590" cy="295" r="3" fill="var(--accent-br)"/>
+        <text x="598" y="299" class="lbl-pin">GPIO25</text>
+        <circle cx="590" cy="320" r="3" fill="var(--accent-br)"/>
+        <text x="598" y="324" class="lbl-pin">GPIO26</text>
+        <circle cx="590" cy="345" r="3" fill="var(--accent-br)"/>
+        <text x="598" y="349" class="lbl-pin">GPIO27</text>
+        <circle cx="590" cy="375" r="3" fill="var(--accent-bl)"/>
+        <text x="598" y="379" class="lbl-pin">GPIO21 (SDA)</text>
+        <circle cx="590" cy="392" r="3" fill="var(--accent-bl)"/>
+        <text x="598" y="396" class="lbl-pin">GPIO22 (SCL)</text>
+      </g>
+      <path d="M210,280 H430" class="wire-power"/>
+      <path d="M218,340 H430" class="wire-ground"/>
+      <path d="M210,380 H430" class="wire-power" stroke-dasharray="4 3"/>
+      <text x="290" y="395" class="lbl-pin" fill="var(--text-faint)">via AMS1117-3.3</text>
+
+      <!-- MPU6050 -->
+      <g>
+        <rect x="700" y="40" width="130" height="80" rx="6" class="node-box"/>
+        <text x="765" y="72" text-anchor="middle" class="lbl">MPU6050</text>
+        <text x="765" y="88" text-anchor="middle" class="lbl-dim">6-axis IMU</text>
+        <circle cx="700" cy="55" r="3" fill="var(--power)"/>
+        <text x="692" y="59" class="lbl-pin" text-anchor="end">VCC</text>
+        <circle cx="700" cy="75" r="3" fill="var(--ground)"/>
+        <text x="692" y="79" class="lbl-pin" text-anchor="end">GND</text>
+        <circle cx="700" cy="95" r="3" fill="var(--accent-bl)"/>
+        <text x="692" y="99" class="lbl-pin" text-anchor="end">SDA</text>
+        <circle cx="700" cy="105" r="3" fill="var(--accent-bl)"/>
+        <text x="692" y="109" class="lbl-pin" text-anchor="end">SCL</text>
+      </g>
+      <path d="M590,375 C 640,375 650,95 700,95" class="wire-i2c"/>
+      <path d="M590,392 C 650,392 660,105 700,105" class="wire-i2c"/>
+      <path d="M590,270 C 660,270 670,55 700,55" class="wire-power" stroke-dasharray="4 3"/>
+      <path d="M218,340 C 250,200 660,200 700,75" class="wire-ground"/>
+
+      <!-- MOSFETs -->
+      <!-- FL -->
+      <g>
+        <rect x="760" y="180" width="80" height="50" rx="5" class="node-box"/>
+        <text x="800" y="200" text-anchor="middle" class="lbl-dim">MOSFET FL</text>
+        <text x="800" y="216" text-anchor="middle" class="lbl-pin">SI2302</text>
+      </g>
+      <path d="M590,270 C 680,270 690,190 760,190" class="wire-signal"/>
+      <text x="690" y="245" class="lbl-pin" fill="var(--signal)">GATE</text>
+
+      <!-- FR -->
+      <g>
+        <rect x="760" y="250" width="80" height="50" rx="5" class="node-box"/>
+        <text x="800" y="270" text-anchor="middle" class="lbl-dim">MOSFET FR</text>
+        <text x="800" y="286" text-anchor="middle" class="lbl-pin">SI2302</text>
+      </g>
+      <path d="M590,295 C 680,295 690,265 760,265" class="wire-signal"/>
+
+      <!-- BL -->
+      <g>
+        <rect x="760" y="320" width="80" height="50" rx="5" class="node-box"/>
+        <text x="800" y="340" text-anchor="middle" class="lbl-dim">MOSFET BL</text>
+        <text x="800" y="356" text-anchor="middle" class="lbl-pin">SI2302</text>
+      </g>
+      <path d="M590,320 C 680,320 690,335 760,335" class="wire-signal"/>
+
+      <!-- BR -->
+      <g>
+        <rect x="760" y="390" width="80" height="50" rx="5" class="node-box"/>
+        <text x="800" y="410" text-anchor="middle" class="lbl-dim">MOSFET BR</text>
+        <text x="800" y="426" text-anchor="middle" class="lbl-pin">SI2302</text>
+      </g>
+      <path d="M590,345 C 680,345 690,405 760,405" class="wire-signal"/>
+
+      <!-- MOSFET sources to GND bus -->
+      <path d="M760,225 C 700,440 230,540 218,540" class="wire-ground"/>
+      <path d="M760,295 C 700,460 235,540 218,540" class="wire-ground"/>
+      <path d="M760,365 C 700,480 240,540 218,540" class="wire-ground"/>
+      <path d="M760,435 C 700,500 245,540 218,540" class="wire-ground"/>
+
+      <!-- Motors -->
+      <g>
+        <circle cx="980" cy="205" r="34" class="node-box"/>
+        <text x="980" y="200" text-anchor="middle" class="lbl-dim">FL</text>
+        <text x="980" y="214" text-anchor="middle" class="lbl-pin" fill="var(--accent-fl)">CW</text>
+      </g>
+      <g>
+        <circle cx="980" cy="275" r="34" class="node-box"/>
+        <text x="980" y="270" text-anchor="middle" class="lbl-dim">FR</text>
+        <text x="980" y="284" text-anchor="middle" class="lbl-pin" fill="var(--accent-fr)">CCW</text>
+      </g>
+      <g>
+        <circle cx="980" cy="345" r="34" class="node-box"/>
+        <text x="980" y="340" text-anchor="middle" class="lbl-dim">BL</text>
+        <text x="980" y="354" text-anchor="middle" class="lbl-pin" fill="var(--accent-bl)">CCW</text>
+      </g>
+      <g>
+        <circle cx="980" cy="415" r="34" class="node-box"/>
+        <text x="980" y="410" text-anchor="middle" class="lbl-dim">BR</text>
+        <text x="980" y="424" text-anchor="middle" class="lbl-pin" fill="var(--accent-br)">CW</text>
+      </g>
+
+      <!-- Motor GND to MOSFET drain -->
+      <path d="M840,205 H946" class="wire-ground"/>
+      <path d="M840,275 H946" class="wire-ground"/>
+      <path d="M840,345 H946" class="wire-ground"/>
+      <path d="M840,415 H946" class="wire-ground"/>
+      <text x="893" y="198" class="lbl-pin" text-anchor="middle" fill="var(--ground)">DRAIN→GND-</text>
+
+      <!-- Motor VCC to power bus (top rail) -->
+      <line x1="1060" y1="40" x2="1060" y2="450" stroke="var(--power)" stroke-width="2.2"/>
+      <path d="M210,120 H1060" class="wire-power"/>
+      <path d="M1014,205 H1060" class="wire-power"/>
+      <path d="M1014,275 H1060" class="wire-power"/>
+      <path d="M1014,345 H1060" class="wire-power"/>
+      <path d="M1014,415 H1060" class="wire-power"/>
+      <text x="1068" y="44" class="lbl-pin" fill="var(--power)">VCC+ BUS</text>
+
+      <!-- 10k pulldown note -->
+      <text x="800" y="470" class="lbl-pin" text-anchor="middle" fill="var(--text-faint)">↳ optional 10kΩ pulldown: GATE → GND at each MOSFET</text>
+    </svg>
+    <div class="stage-caption">
+      <span>FIG 1.0 — System-wide connection map</span>
+      <span class="hint">red = power · grey = ground · amber = PWM · purple = I²C</span>
+    </div>
+  </div>
+
+  <div class="warn-strip">
+    <span class="wmark">⚠</span>
+    <span>Connect the LiPo battery <b>last</b>, only after every joint above has been visually verified. Never let DRAIN touch the ground rail directly — it must only connect to a motor's negative wire.</span>
+  </div>
+
+  <!-- ════════════════════ SECTION 2 — INTERACTIVE MAP ════════════════════ -->
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Interactive Component Map</h2>
+    <span class="sec-line"></span>
+  </div>
+  <p class="sec-desc">
+    Click any component to isolate its connections and inspect every pin in the panel on the right.
+    Click empty space to reset the view.
+  </p>
+
+  <div class="map-shell">
+    <div id="wiringSvgHost">
+      <svg viewBox="0 0 760 620" xmlns="http://www.w3.org/2000/svg" id="mapSvg">
+
+        <!-- WIRES (drawn first, under nodes) -->
+        <!-- LiPo -> ESP32 VIN -->
+        <path id="w-lipo-esp32-power" class="wire wire-power" data-a="lipo" data-b="esp32" d="M150,300 C 230,300 230,300 270,300"/>
+        <path id="w-lipo-esp32-gnd" class="wire wire-ground" data-a="lipo" data-b="esp32" d="M150,330 C 230,330 230,330 270,330"/>
+        <!-- ESP32 -> MPU6050 -->
+        <path id="w-esp32-mpu-vcc" class="wire wire-power" data-a="esp32" data-b="mpu" d="M390,250 C 420,180 420,180 470,150"/>
+        <path id="w-esp32-mpu-gnd" class="wire wire-ground" data-a="esp32" data-b="mpu" d="M390,270 C 420,200 420,200 470,170"/>
+        <path id="w-esp32-mpu-sda" class="wire wire-i2c" data-a="esp32" data-b="mpu" d="M390,290 C 430,220 430,220 470,190"/>
+        <path id="w-esp32-mpu-scl" class="wire wire-i2c" data-a="esp32" data-b="mpu" d="M390,310 C 440,240 440,240 470,210"/>
+        <!-- ESP32 -> MOSFETs (gate) -->
+        <path id="w-esp32-mfl-gate" class="wire wire-signal" data-a="esp32" data-b="mfl" d="M390,260 C 440,260 440,260 470,310"/>
+        <path id="w-esp32-mfr-gate" class="wire wire-signal" data-a="esp32" data-b="mfr" d="M390,300 C 440,330 440,330 470,390"/>
+        <path id="w-esp32-mbl-gate" class="wire wire-signal" data-a="esp32" data-b="mbl" d="M390,340 C 440,400 440,400 470,470"/>
+        <path id="w-esp32-mbr-gate" class="wire wire-signal" data-a="esp32" data-b="mbr" d="M390,380 C 440,470 440,470 470,550"/>
+        <!-- LiPo -> motors VCC (top rail) -->
+        <path id="w-lipo-motfl-vcc" class="wire wire-power" data-a="lipo" data-b="motfl" d="M120,260 C 90,80 600,40 660,260"/>
+        <path id="w-lipo-motfr-vcc" class="wire wire-power" data-a="lipo" data-b="motfr" d="M120,265 C 95,90 605,90 660,330"/>
+        <path id="w-lipo-motbl-vcc" class="wire wire-power" data-a="lipo" data-b="motbl" d="M120,270 C 100,100 610,140 660,400"/>
+        <path id="w-lipo-motbr-vcc" class="wire wire-power" data-a="lipo" data-b="motbr" d="M120,275 C 105,110 615,190 660,470"/>
+        <!-- MOSFET DRAIN -> motor GND -->
+        <path id="w-mfl-motfl-gnd" class="wire wire-ground" data-a="mfl" data-b="motfl" d="M540,300 C 590,290 600,280 600,260"/>
+        <path id="w-mfr-motfr-gnd" class="wire wire-ground" data-a="mfr" data-b="motfr" d="M540,380 C 590,360 600,345 600,330"/>
+        <path id="w-mbl-motbl-gnd" class="wire wire-ground" data-a="mbl" data-b="motbl" d="M540,460 C 590,430 600,415 600,400"/>
+        <path id="w-mbr-motbr-gnd" class="wire wire-ground" data-a="mbr" data-b="motbr" d="M540,540 C 590,500 600,485 600,470"/>
+        <!-- MOSFET SOURCE -> GND rail -->
+        <path id="w-mfl-gndrail" class="wire wire-ground" data-a="mfl" data-b="esp32" d="M470,320 C 420,420 380,420 380,360"/>
+        <path id="w-mfr-gndrail" class="wire wire-ground" data-a="mfr" data-b="esp32" d="M470,400 C 420,440 380,440 380,360"/>
+        <path id="w-mbl-gndrail" class="wire wire-ground" data-a="mbl" data-b="esp32" d="M470,480 C 420,460 380,460 380,360"/>
+        <path id="w-mbr-gndrail" class="wire wire-ground" data-a="mbr" data-b="esp32" d="M470,560 C 420,480 380,480 380,360"/>
+
+        <!-- NODES -->
+        <g class="node" id="n-lipo" data-id="lipo">
+          <rect x="20" y="260" width="100" height="60" rx="6" class="node-box"/>
+          <text x="70" y="285" text-anchor="middle" class="lbl">LiPo</text>
+          <text x="70" y="300" text-anchor="middle" class="lbl-dim">3.7V 1000mAh</text>
+        </g>
+
+        <g class="node" id="n-esp32" data-id="esp32">
+          <rect x="270" y="240" width="120" height="130" rx="6" class="node-box highlight"/>
+          <text x="330" y="280" text-anchor="middle" class="lbl">ESP32</text>
+          <text x="330" y="296" text-anchor="middle" class="lbl-dim">DevKit Board</text>
+        </g>
+
+        <g class="node" id="n-mpu" data-id="mpu">
+          <rect x="470" y="120" width="110" height="80" rx="6" class="node-box"/>
+          <text x="525" y="155" text-anchor="middle" class="lbl">MPU6050</text>
+          <text x="525" y="171" text-anchor="middle" class="lbl-dim">IMU · I²C</text>
+        </g>
+
+        <g class="node" id="n-mfl" data-id="mfl">
+          <rect x="470" y="280" width="70" height="50" rx="5" class="node-box"/>
+          <text x="505" y="300" text-anchor="middle" class="lbl-dim" font-size="10">MOSFET</text>
+          <text x="505" y="314" text-anchor="middle" class="lbl-pin" fill="var(--accent-fl)">FL</text>
+        </g>
+        <g class="node" id="n-mfr" data-id="mfr">
+          <rect x="470" y="360" width="70" height="50" rx="5" class="node-box"/>
+          <text x="505" y="380" text-anchor="middle" class="lbl-dim" font-size="10">MOSFET</text>
+          <text x="505" y="394" text-anchor="middle" class="lbl-pin" fill="var(--accent-fr)">FR</text>
+        </g>
+        <g class="node" id="n-mbl" data-id="mbl">
+          <rect x="470" y="440" width="70" height="50" rx="5" class="node-box"/>
+          <text x="505" y="460" text-anchor="middle" class="lbl-dim" font-size="10">MOSFET</text>
+          <text x="505" y="474" text-anchor="middle" class="lbl-pin" fill="var(--accent-bl)">BL</text>
+        </g>
+        <g class="node" id="n-mbr" data-id="mbr">
+          <rect x="470" y="520" width="70" height="50" rx="5" class="node-box"/>
+          <text x="505" y="540" text-anchor="middle" class="lbl-dim" font-size="10">MOSFET</text>
+          <text x="505" y="554" text-anchor="middle" class="lbl-pin" fill="var(--accent-br)">BR</text>
+        </g>
+
+        <g class="node" id="n-motfl" data-id="motfl">
+          <circle cx="630" cy="260" r="30" class="node-box"/>
+          <text x="630" y="256" text-anchor="middle" class="lbl-dim" font-size="10">FL</text>
+          <text x="630" y="269" text-anchor="middle" class="lbl-pin" fill="var(--accent-fl)">CW</text>
+        </g>
+        <g class="node" id="n-motfr" data-id="motfr">
+          <circle cx="630" cy="330" r="30" class="node-box"/>
+          <text x="630" y="326" text-anchor="middle" class="lbl-dim" font-size="10">FR</text>
+          <text x="630" y="339" text-anchor="middle" class="lbl-pin" fill="var(--accent-fr)">CCW</text>
+        </g>
+        <g class="node" id="n-motbl" data-id="motbl">
+          <circle cx="630" cy="400" r="30" class="node-box"/>
+          <text x="630" y="396" text-anchor="middle" class="lbl-dim" font-size="10">BL</text>
+          <text x="630" y="409" text-anchor="middle" class="lbl-pin" fill="var(--accent-bl)">CCW</text>
+        </g>
+        <g class="node" id="n-motbr" data-id="motbr">
+          <circle cx="630" cy="470" r="30" class="node-box"/>
+          <text x="630" y="466" text-anchor="middle" class="lbl-dim" font-size="10">BR</text>
+          <text x="630" y="479" text-anchor="middle" class="lbl-pin" fill="var(--accent-br)">CW</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="inspector" id="inspector">
+      <div class="ins-empty">Click a component<br>to inspect its connections</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ SECTION 3 — MOTOR / GPIO LAYOUT ════════════════════ -->
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Motor Layout &amp; Rotation</h2>
+    <span class="sec-line"></span>
+  </div>
+  <p class="sec-desc">
+    X-configuration with alternating rotation on diagonal pairs to cancel yaw torque. Propeller type must
+    match motor rotation — a mismatched prop produces zero usable thrust.
+  </p>
+
+  <div class="stage" style="padding:30px;">
+    <svg viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg" style="max-width:420px; margin:0 auto; display:block;">
+      <text x="250" y="24" text-anchor="middle" class="lbl-dim">FRONT</text>
+      <text x="250" y="404" text-anchor="middle" class="lbl-dim">REAR</text>
+
+      <!-- frame arms -->
+      <line x1="250" y1="210" x2="110" y2="90" stroke="var(--grid-line)" stroke-width="6" stroke-linecap="round"/>
+      <line x1="250" y1="210" x2="390" y2="90" stroke="var(--grid-line)" stroke-width="6" stroke-linecap="round"/>
+      <line x1="250" y1="210" x2="110" y2="330" stroke="var(--grid-line)" stroke-width="6" stroke-linecap="round"/>
+      <line x1="250" y1="210" x2="390" y2="330" stroke="var(--grid-line)" stroke-width="6" stroke-linecap="round"/>
+
+      <!-- center body -->
+      <rect x="225" y="190" width="50" height="40" rx="6" fill="var(--bg)" stroke="var(--silk)" stroke-width="1.4"/>
+      <text x="250" y="215" text-anchor="middle" class="lbl-pin">IMU</text>
+
+      <!-- FL motor -->
+      <circle cx="110" cy="90" r="46" fill="var(--bg)" stroke="var(--accent-fl)" stroke-width="2.4"/>
+      <text x="110" y="84" text-anchor="middle" class="lbl">FL</text>
+      <text x="110" y="100" text-anchor="middle" class="lbl-pin" fill="var(--accent-fl)">CW · GPIO13</text>
+      <path d="M85,65 A 35 35 0 0 1 135 65" stroke="var(--accent-fl)" stroke-width="2" fill="none" marker-end="url(#arrowFL)"/>
+
+      <!-- FR motor -->
+      <circle cx="390" cy="90" r="46" fill="var(--bg)" stroke="var(--accent-fr)" stroke-width="2.4"/>
+      <text x="390" y="84" text-anchor="middle" class="lbl">FR</text>
+      <text x="390" y="100" text-anchor="middle" class="lbl-pin" fill="var(--accent-fr)">CCW · GPIO25</text>
+      <path d="M415,65 A 35 35 0 0 0 365 65" stroke="var(--accent-fr)" stroke-width="2" fill="none" marker-end="url(#arrowFR)"/>
+
+      <!-- BL motor -->
+      <circle cx="110" cy="330" r="46" fill="var(--bg)" stroke="var(--accent-bl)" stroke-width="2.4"/>
+      <text x="110" y="324" text-anchor="middle" class="lbl">BL</text>
+      <text x="110" y="340" text-anchor="middle" class="lbl-pin" fill="var(--accent-bl)">CCW · GPIO26</text>
+      <path d="M135,305 A 35 35 0 0 0 85 305" stroke="var(--accent-bl)" stroke-width="2" fill="none" marker-end="url(#arrowBL)"/>
+
+      <!-- BR motor -->
+      <circle cx="390" cy="330" r="46" fill="var(--bg)" stroke="var(--accent-br)" stroke-width="2.4"/>
+      <text x="390" y="324" text-anchor="middle" class="lbl">BR</text>
+      <text x="390" y="340" text-anchor="middle" class="lbl-pin" fill="var(--accent-br)">CW · GPIO27</text>
+      <path d="M365,305 A 35 35 0 0 1 415 305" stroke="var(--accent-br)" stroke-width="2" fill="none" marker-end="url(#arrowBR)"/>
+
+      <defs>
+        <marker id="arrowFL" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent-fl)"/></marker>
+        <marker id="arrowFR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent-fr)"/></marker>
+        <marker id="arrowBL" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent-bl)"/></marker>
+        <marker id="arrowBR" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--accent-br)"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="quad-grid">
+    <div class="quad-card fl">
+      <div class="qhead"><span class="qpos">Front-Left</span><span class="qrot">Clockwise</span></div>
+      <div class="qrow">GPIO Pin <b>13</b></div>
+      <div class="qrow">MOSFET <b>mosfet_fl</b></div>
+      <div class="qrow">Propeller <b>CW</b></div>
+    </div>
+    <div class="quad-card fr">
+      <div class="qhead"><span class="qpos">Front-Right</span><span class="qrot">Counter-Clockwise</span></div>
+      <div class="qrow">GPIO Pin <b>25</b></div>
+      <div class="qrow">MOSFET <b>mosfet_fr</b></div>
+      <div class="qrow">Propeller <b>CCW</b></div>
+    </div>
+    <div class="quad-card bl">
+      <div class="qhead"><span class="qpos">Back-Left</span><span class="qrot">Counter-Clockwise</span></div>
+      <div class="qrow">GPIO Pin <b>26</b></div>
+      <div class="qrow">MOSFET <b>mosfet_bl</b></div>
+      <div class="qrow">Propeller <b>CCW</b></div>
+    </div>
+    <div class="quad-card br">
+      <div class="qhead"><span class="qpos">Back-Right</span><span class="qrot">Clockwise</span></div>
+      <div class="qrow">GPIO Pin <b>27</b></div>
+      <div class="qrow">MOSFET <b>mosfet_br</b></div>
+      <div class="qrow">Propeller <b>CW</b></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ SECTION 4 — FULL PIN TABLE ════════════════════ -->
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Complete Pin Reference</h2>
+    <span class="sec-line"></span>
+  </div>
+  <p class="sec-desc">Every physical connection in the build, in build order.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Pin</th><th>Connects To</th><th>Type</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>LiPo 3.7V 1000mAh</td><td>+V</td><td>ESP32 VIN · Motor VCC+ bus</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>LiPo 3.7V 1000mAh</td><td>GND</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>ESP32</td><td>VIN</td><td>LiPo +V (via AMS1117-3.3)</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>ESP32</td><td>GND</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>ESP32</td><td>3V3</td><td>MPU6050 VCC</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO21</td><td>MPU6050 SDA</td><td><span class="tag-pill i2c">i2c</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO22</td><td>MPU6050 SCL</td><td><span class="tag-pill i2c">i2c</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO13</td><td>MOSFET FL — GATE</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO25</td><td>MOSFET FR — GATE</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO26</td><td>MOSFET BL — GATE</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>ESP32</td><td>GPIO27</td><td>MOSFET BR — GATE</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>MPU6050 IMU</td><td>VCC</td><td>ESP32 3V3</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>MPU6050 IMU</td><td>GND</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>MPU6050 IMU</td><td>SDA</td><td>ESP32 GPIO21</td><td><span class="tag-pill i2c">i2c</span></td></tr>
+        <tr><td>MPU6050 IMU</td><td>SCL</td><td>ESP32 GPIO22</td><td><span class="tag-pill i2c">i2c</span></td></tr>
+        <tr><td>MOSFET FL (SI2302)</td><td>GATE</td><td>ESP32 GPIO13</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>MOSFET FL (SI2302)</td><td>SOURCE</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>MOSFET FL (SI2302)</td><td>DRAIN</td><td>Motor FL — GND-</td><td><span class="tag-pill data">data</span></td></tr>
+        <tr><td>MOSFET FR (SI2302)</td><td>GATE</td><td>ESP32 GPIO25</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>MOSFET FR (SI2302)</td><td>SOURCE</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>MOSFET FR (SI2302)</td><td>DRAIN</td><td>Motor FR — GND-</td><td><span class="tag-pill data">data</span></td></tr>
+        <tr><td>MOSFET BL (SI2302)</td><td>GATE</td><td>ESP32 GPIO26</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>MOSFET BL (SI2302)</td><td>SOURCE</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>MOSFET BL (SI2302)</td><td>DRAIN</td><td>Motor BL — GND-</td><td><span class="tag-pill data">data</span></td></tr>
+        <tr><td>MOSFET BR (SI2302)</td><td>GATE</td><td>ESP32 GPIO27</td><td><span class="tag-pill pwm">pwm</span></td></tr>
+        <tr><td>MOSFET BR (SI2302)</td><td>SOURCE</td><td>Common GND rail</td><td><span class="tag-pill ground">ground</span></td></tr>
+        <tr><td>MOSFET BR (SI2302)</td><td>DRAIN</td><td>Motor BR — GND-</td><td><span class="tag-pill data">data</span></td></tr>
+        <tr><td>Motor FL (CW)</td><td>VCC+</td><td>LiPo +V bus</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>Motor FR (CCW)</td><td>VCC+</td><td>LiPo +V bus</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>Motor BL (CCW)</td><td>VCC+</td><td>LiPo +V bus</td><td><span class="tag-pill power">power</span></td></tr>
+        <tr><td>Motor BR (CW)</td><td>VCC+</td><td>LiPo +V bus</td><td><span class="tag-pill power">power</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note-strip">
+    <span class="nmark">i</span>
+    <span>SI2302 SOT-23 pinout (flat face toward you, pins down): <b style="color:var(--text-main)">Gate = left</b>, <b style="color:var(--text-main)">Source = right</b>, <b style="color:var(--text-main)">Drain = middle-top</b>. A 10kΩ pull-down between Gate and Source at each MOSFET is recommended to prevent noise-induced spin-up.</span>
+  </div>
+
+  <footer>
+    <span>ESP_GO · ESP32 Wi-Fi Quadcopter</span>
+    <span>Diagram generated for build reference — verify against datasheets before powering on</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const nodeData = {
+    lipo: {
+      tag: "power", title: "LiPo 3.7V 1000mAh", sub: "Single-cell battery · primary power source for the entire airframe",
+      pins: [
+        {name:"+V", type:"power", target:"ESP32 VIN · Motor VCC+ bus"},
+        {name:"GND", type:"ground", target:"Common ground rail"}
+      ]
+    },
+    esp32: {
+      tag: "mcu", title: "ESP32 DevKit", sub: "Flight controller · Wi-Fi access point · PID loop · PWM motor driver",
+      pins: [
+        {name:"VIN", type:"power", target:"LiPo +V (via AMS1117-3.3)"},
+        {name:"GND", type:"ground", target:"Common ground rail"},
+        {name:"3V3", type:"power", target:"MPU6050 VCC"},
+        {name:"GPIO21", type:"i2c", target:"MPU6050 SDA"},
+        {name:"GPIO22", type:"i2c", target:"MPU6050 SCL"},
+        {name:"GPIO13", type:"signal", target:"MOSFET FL — GATE"},
+        {name:"GPIO25", type:"signal", target:"MOSFET FR — GATE"},
+        {name:"GPIO26", type:"signal", target:"MOSFET BL — GATE"},
+        {name:"GPIO27", type:"signal", target:"MOSFET BR — GATE"}
+      ]
+    },
+    mpu: {
+      tag: "sensor", title: "MPU6050 IMU", sub: "6-axis gyro + accelerometer · feeds the PID self-leveling loop over I²C",
+      pins: [
+        {name:"VCC", type:"power", target:"ESP32 3V3 (3.3V only)"},
+        {name:"GND", type:"ground", target:"Common ground rail"},
+        {name:"SDA", type:"i2c", target:"ESP32 GPIO21"},
+        {name:"SCL", type:"i2c", target:"ESP32 GPIO22"}
+      ]
+    },
+    mfl: {
+      tag: "actuator", title: "MOSFET — Front-Left", sub: "SI2302 N-Channel · switches Motor FL ground path",
+      pins: [
+        {name:"GATE", type:"signal", target:"ESP32 GPIO13"},
+        {name:"SOURCE", type:"ground", target:"Common ground rail"},
+        {name:"DRAIN", type:"ground", target:"Motor FL — GND-"}
+      ]
+    },
+    mfr: {
+      tag: "actuator", title: "MOSFET — Front-Right", sub: "SI2302 N-Channel · switches Motor FR ground path",
+      pins: [
+        {name:"GATE", type:"signal", target:"ESP32 GPIO25"},
+        {name:"SOURCE", type:"ground", target:"Common ground rail"},
+        {name:"DRAIN", type:"ground", target:"Motor FR — GND-"}
+      ]
+    },
+    mbl: {
+      tag: "actuator", title: "MOSFET — Back-Left", sub: "SI2302 N-Channel · switches Motor BL ground path",
+      pins: [
+        {name:"GATE", type:"signal", target:"ESP32 GPIO26"},
+        {name:"SOURCE", type:"ground", target:"Common ground rail"},
+        {name:"DRAIN", type:"ground", target:"Motor BL — GND-"}
+      ]
+    },
+    mbr: {
+      tag: "actuator", title: "MOSFET — Back-Right", sub: "SI2302 N-Channel · switches Motor BR ground path",
+      pins: [
+        {name:"GATE", type:"signal", target:"ESP32 GPIO27"},
+        {name:"SOURCE", type:"ground", target:"Common ground rail"},
+        {name:"DRAIN", type:"ground", target:"Motor BR — GND-"}
+      ]
+    },
+    motfl: {
+      tag: "actuator", title: "Motor — Front-Left (CW)", sub: "8520 coreless brushed · ~1A peak · clockwise rotation, CW propeller",
+      pins: [
+        {name:"VCC+", type:"power", target:"LiPo +V bus"},
+        {name:"GND-", type:"ground", target:"MOSFET FL — DRAIN"}
+      ]
+    },
+    motfr: {
+      tag: "actuator", title: "Motor — Front-Right (CCW)", sub: "8520 coreless brushed · ~1A peak · counter-clockwise rotation, CCW propeller",
+      pins: [
+        {name:"VCC+", type:"power", target:"LiPo +V bus"},
+        {name:"GND-", type:"ground", target:"MOSFET FR — DRAIN"}
+      ]
+    },
+    motbl: {
+      tag: "actuator", title: "Motor — Back-Left (CCW)", sub: "8520 coreless brushed · ~1A peak · counter-clockwise rotation, CCW propeller",
+      pins: [
+        {name:"VCC+", type:"power", target:"LiPo +V bus"},
+        {name:"GND-", type:"ground", target:"MOSFET BL — DRAIN"}
+      ]
+    },
+    motbr: {
+      tag: "actuator", title: "Motor — Back-Right (CW)", sub: "8520 coreless brushed · ~1A peak · clockwise rotation, CW propeller",
+      pins: [
+        {name:"VCC+", type:"power", target:"LiPo +V bus"},
+        {name:"GND-", type:"ground", target:"MOSFET BR — DRAIN"}
+      ]
+    }
+  };
+
+  const svg = document.getElementById('mapSvg');
+  const inspector = document.getElementById('inspector');
+  const nodes = svg.querySelectorAll('.node');
+  const wires = svg.querySelectorAll('.wire');
+
+  function renderInspector(id){
+    const d = nodeData[id];
+    if(!d){ inspector.innerHTML = '<div class="ins-empty">Click a component<br>to inspect its connections</div>'; return; }
+    let pinsHtml = d.pins.map(p => `
+      <div class="pin-row">
+        <span class="pin-name"><span class="pin-dot ${p.type}"></span>${p.name}</span>
+        <span class="pin-target">${p.target}</span>
+      </div>`).join('');
+    inspector.innerHTML = `
+      <span class="ins-tag ${d.tag}">${d.tag}</span>
+      <h3>${d.title}</h3>
+      <div class="ins-sub">${d.sub}</div>
+      <div>${pinsHtml}</div>
+    `;
+  }
+
+  function isolate(id){
+    nodes.forEach(n => {
+      if(n.dataset.id === id) n.classList.remove('dimmed');
+      else n.classList.add('dimmed');
+    });
+    wires.forEach(w => {
+      if(w.dataset.a === id || w.dataset.b === id){
+        w.classList.remove('dimmed');
+        w.classList.add('active');
+      } else {
+        w.classList.add('dimmed');
+        w.classList.remove('active');
+      }
+    });
+    renderInspector(id);
+  }
+
+  function reset(){
+    nodes.forEach(n => n.classList.remove('dimmed'));
+    wires.forEach(w => { w.classList.remove('dimmed'); w.classList.remove('active'); });
+    renderInspector(null);
+  }
+
+  nodes.forEach(n => {
+    n.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isolate(n.dataset.id);
+    });
+  });
+
+  svg.addEventListener('click', () => reset());
+})();
+</script>
+
+</body>
+</html>
